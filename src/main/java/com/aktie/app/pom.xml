@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.aktie</groupId>
+        <artifactId>quarkus-modulith-sample</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>app</artifactId>
+
+    <dependencies>
+        <!-- Módulos do projeto -->
+        <dependency>
+            <groupId>com.aktie</groupId>
+            <artifactId>catalog</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.aktie</groupId>
+            <artifactId>sale</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.aktie</groupId>
+            <artifactId>stock</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.aktie</groupId>
+            <artifactId>user</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.aktie</groupId>
+            <artifactId>delivery</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>${quarkus.platform.group-id}</groupId>
+                <artifactId>quarkus-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
