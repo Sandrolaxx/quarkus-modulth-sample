@@ -6,12 +6,12 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
 @Path("/catalog")
-public class GreetingResource {
+public class CatalogResource {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String hello() {
-        return "Olá de catalog";
+        return "Olá de catalog🍽";
     }
     
 }

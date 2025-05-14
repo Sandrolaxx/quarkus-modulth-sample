@@ -1,3 +1,12 @@
+## Branch estrutura básica
+
+Pontos importantes das definições para implementação do modulith.
+
+
+---
+
+### Estrutura do projeto
+
 Dependências entre módulos:
 
 - Catalog: Não depende de outros módulos
