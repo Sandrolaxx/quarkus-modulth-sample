@@ -1,44 +1,20 @@
 package com.aktie;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
+import io.quarkus.runtime.Quarkus;
+import io.quarkus.runtime.annotations.QuarkusMain;
 
-import com.aktie.common.IAppModule;
-
-import io.quarkus.runtime.ShutdownEvent;
-import io.quarkus.runtime.StartupEvent;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.event.Observes;
-import jakarta.enterprise.inject.Instance;
-import jakarta.inject.Inject;
-
-@ApplicationScoped
+@QuarkusMain
 public class Initializer {
 
-    @Inject
-    Instance<IAppModule> modules;
-
-    void onStart(@Observes StartupEvent ev) {
-        List<IAppModule> sortedModules = modules.stream()
-                .sorted(Comparator.comparingInt(IAppModule::getPriority))
-                .collect(Collectors.toList());
-
-        for (IAppModule module : sortedModules) {
-            module.init();
-        }
-
-        var modules = sortedModules.stream().map(IAppModule::getName).toList();
-        System.out.println("Loaded modules: ".concat(modules.toString()));
+    public static void main(String ... args) {
+        System.out.println("" + //
+        "   _____                 __           __              __  ___          __      ___ __  __  \n" + //
+        "  / ___/____ _____  ____/ /________  / /___ __  __   /  |/  /___  ____/ /_  __/ (_) /_/ /_ \n" + //
+        "  \\__ \\/ __ `/ __ \\/ __  / ___/ __ \\/ / __ `/ |/_/  / /|_/ / __ \\/ __  / / / / / / __/ __ \\\n" + //
+        " ___/ / /_/ / / / / /_/ / /  / /_/ / / /_/ />  <   / /  / / /_/ / /_/ / /_/ / / / /_/ / / /\n" + //
+        "/____/\\__,_/_/ /_/\\__,_/_/   \\____/_/\\__,_/_/|_|  /_/  /_/\\____/\\__,_/\\__,_/_/_/\\__/_/ /_/ \n" + //
+        "");
+        Quarkus.run(args); 
     }
 
-    void onShutdown(@Observes ShutdownEvent ev) {
-        List<IAppModule> revertedModules = modules.stream()
-                .sorted(Comparator.comparingInt(IAppModule::getPriority).reversed())
-                .collect(Collectors.toList());
-
-        for (IAppModule module : revertedModules) {
-            module.shutdown();
-        }
-    }
 }

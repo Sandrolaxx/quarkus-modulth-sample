@@ -10,7 +10,6 @@
 
     <modules>
         <module>app</module>
-        <module>app-common</module>
         <module>catalog</module>
         <module>sale</module>
         <module>stock</module>
