@@ -20,7 +20,6 @@ public class Initializer {
     Instance<IAppModule> modules;
 
     void onStart(@Observes StartupEvent ev) {
-        // Init por prioridade
         List<IAppModule> sortedModules = modules.stream()
                 .sorted(Comparator.comparingInt(IAppModule::getPriority))
                 .collect(Collectors.toList());
