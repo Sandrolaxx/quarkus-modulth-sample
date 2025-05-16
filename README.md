@@ -89,6 +89,47 @@ Mesmo o pom.xml root sendo muito importante, não é ele que inicia nossa aplica
 
 ### Passo a passo para adicionar um módulo
 
+Aqui temos o fluxo para adicionar mais um bounded-context a nosso modulith, nesse nosso exemplo falta o módulo delivery, então será ele que iremos adicionar.
+
+Começamos criando um projeto chamado `delivery` e adicionamos ao nosso projeto principal:
+![Create new project](https://github.com/user-attachments/assets/3e05e090-b43b-480f-8246-071430836b0f)
+
+Então vamos criar duas classes, para nosso exemplo ficar mais rico:
+![create_sample_classesmage](https://github.com/user-attachments/assets/33ee9446-2694-411d-af18-bc6e346be0dc)
+
+A classe DeliveryModule que implementará a interface que irá permitir injetar ela no startup do módulo `app`(Não obrigatório*)
+![Class delivery module](https://github.com/user-attachments/assets/9ea99212-5381-4c48-8982-22f9a2fea5be)
+
+A classe que terá um simples end-point, mostrando que ele é carregado no contexto de `app`.
+![Class delivery resource](https://github.com/user-attachments/assets/425149ef-00da-466f-a87f-776874608e7b)
+
+Em nosso pom(delivery) precisamos adicionar as tags do **pom parent**, ou seja o pom root do projeto principal:
+![Pom do nosso projeto](https://github.com/user-attachments/assets/e5e824db-e54b-4248-875c-4511d166b030)
+
+Falando do root pom, precisamos também adicionar o nosso novo módulo nele!
+![Root pom](https://github.com/user-attachments/assets/3c9080e6-86ad-4153-840d-ad52e333170c)
+
+Também vamos adicionar ao pom(app) do nosso entry-point, o módulo `app`, ele possuí como dependência todos os módulos.
+![App pomm](https://github.com/user-attachments/assets/2074825f-f72f-4af1-9ff4-4c2db71c4d8d)
+
+Podemos no terminal da raiz do nosso projeto, executar o comando de limpar e construir do maven, ele irá realizar o clean e o build de todos os módulos, ao finalizar você terá um log no console similar ao abaixo.
+
+Comando: `./mvnw clean install`
+
+![Log build root](https://github.com/user-attachments/assets/4ab22b4d-e541-4029-b314-2d9c7bf5cb70)
+
+Agora vamos entrar na pasta do módulo `app` para executar o projeto.
+
+Comando para executar: `./mvnw quarkus:dev`
+
+Retorno algo similar ao print abaixo:
+![Execução projeto](https://github.com/user-attachments/assets/a69d95a7-4c19-4fce-a8ed-ba632041b300)
+
+Agora podemos acessar o recurso de cada módulo sem problemas.
+![End-points](https://github.com/user-attachments/assets/0132380c-9c77-4908-875a-50275bae0ebb)
+
+Com isso temos as bases para criar nosso monolito modular e evoluir ele a medida que for necessário.💯
+
 ---
 
 ### Como essa mágica funciona?
@@ -109,6 +150,56 @@ Como CDI permite essa "mágica" entre os módulos?
 [CDI no Quarkus](https://quarkus.io/guides/cdi-reference#jandex)
 
 [Espec CDI Jakarta](https://jakarta.ee/specifications/cdi/)
+
+---
+
+### Funcionamento do projeto exemplo
+
+Por mais que temos a interação entre os módulos funcionando de maneira correta, precisamos de um `entry-point`, um ponto de entrada que realiza a execução do processo, isso é feito pelo nosso módulo `app`, nele temos a injeção dos beans de todos os projetos, por mais que os módulos não estão sendo executados por si só, suas funcionalidades estão sendo "ativadas" no módulo `app` quando executamos.
+
+---
+
+## ATENÇÃO⚠
+
+O exemplo que temos é apenas para demonstrar que já é possível utilizar funcionalidades(beans)! Não é necessário fazer todo o fluxo abaixo para conseguir utilizar o Bean de um módulo em outro, poderíamos apenas injetar diretamente com **@Inject**. Nesse caso, não teria a necessidade de criar **Initializer** e **IAppModule** para ativar o CDI de todos os módulos.
+
+Estamos fazendo a mesma injeção, porém de uma maneira mas elegante, mas ela não é mandatória =).
+
+---
+
+Na execução da nossa classe `Initializer.java` no módulo `app`, no evento de iniciar a aplicação, pegamos todas as classes que implementam a interface `IAppModule` e as injetamos nesse contexto comum de app.
+
+```java
+@ApplicationScoped
+public class Initializer {
+
+    @Inject
+    Instance<IAppModule> modules;
+
+    void onStart(@Observes StartupEvent ev) {
+        List<IAppModule> sortedModules = modules.stream()
+                .sorted(Comparator.comparingInt(IAppModule::getPriority))
+                .collect(Collectors.toList());
+
+        for (IAppModule module : sortedModules) {
+            module.init();
+        }
+
+        var modules = sortedModules.stream().map(IAppModule::getName).toList();
+        System.out.println("Loaded modules: ".concat(modules.toString()));
+    }
+
+    void onShutdown(@Observes ShutdownEvent ev) {
+        List<IAppModule> revertedModules = modules.stream()
+                .sorted(Comparator.comparingInt(IAppModule::getPriority).reversed())
+                .collect(Collectors.toList());
+
+        for (IAppModule module : revertedModules) {
+            module.shutdown();
+        }
+    }
+}
+```
 
 ---
 
