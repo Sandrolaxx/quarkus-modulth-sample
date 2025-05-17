@@ -5,6 +5,7 @@ import java.util.List;
 import com.aktie.sale.domain.entities.dto.SaleDTO;
 import com.aktie.sale.domain.entities.enums.EnumErrorCode;
 import com.aktie.sale.domain.entities.mappers.SaleMapper;
+import com.aktie.sale.domain.entities.vo.UuidVO;
 import com.aktie.sale.domain.repositories.ISaleRepository;
 import com.aktie.sale.domain.utils.exception.AktieException;
 import com.aktie.user.domain.entities.dto.UserDTO;
@@ -28,7 +29,7 @@ public class CreateSale {
     }
 
     public SaleDTO execute(SaleDTO dto) {
-        var user = verifyExistingUser(dto.getUser().getId());
+        var user = verifyExistingUser(dto.getUserId());
 
         dto.setUser(user);
 
@@ -38,11 +39,11 @@ public class CreateSale {
     }
 
     private UserDTO verifyExistingUser(String userId) {
-        var queryFieldDoc = new QueryFieldInfoVO("id", userId);
+        var queryFieldDoc = new QueryFieldInfoVO("id", new UuidVO(userId).getValue());
 
         var user = userRepository.findFirstBy(List.of(queryFieldDoc));
 
-        if (user != null) {
+        if (user == null) {
             throw new AktieException(EnumErrorCode.USUARIO_NAO_ENCONTRADO);
         }
 

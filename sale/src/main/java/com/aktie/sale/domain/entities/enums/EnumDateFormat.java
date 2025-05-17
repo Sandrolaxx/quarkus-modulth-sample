@@ -1,4 +1,4 @@
-package com.aktie.user.domain.entities.enums;
+package com.aktie.sale.domain.entities.enums;
 
 import java.text.ParseException;
 import java.time.LocalDate;
